@@ -205,7 +205,7 @@ private:
     Link link_;
     QString tooltip_;
     ImagePtr thumbnail_;
-    ThumbnailType thumbnailType_;
+    ThumbnailType thumbnailType_{};
     MessageElementFlags flags_;
 };
 

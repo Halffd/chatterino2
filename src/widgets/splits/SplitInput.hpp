@@ -141,7 +141,7 @@ protected:
         QHBoxLayout *replyHbox;
         QLabel *replyLabel;
         EffectLabel *cancelReplyButton;
-    } ui_;
+    } ui_{};
 
     std::shared_ptr<MessageThread> replyThread_ = nullptr;
     bool enableInlineReplying_;

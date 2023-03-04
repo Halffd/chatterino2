@@ -280,7 +280,7 @@ private:
     const QString subscriptionUrl_;
     const QString channelUrl_;
     const QString popoutPlayerUrl_;
-    int chatterCount_;
+    int chatterCount_{};
     UniqueAccess<StreamStatus> streamStatus_;
     UniqueAccess<RoomModes> roomModes_;
     std::atomic_flag loadingRecentMessages_ = ATOMIC_FLAG_INIT;
@@ -328,7 +328,7 @@ private:
      * The index of the twitch connection in
      * 7TV's user representation.
      */
-    size_t seventvUserTwitchConnectionIndex_;
+    size_t seventvUserTwitchConnectionIndex_{};
 
     /** The platform of the last live emote update ("7TV", "BTTV", "FFZ"). */
     QString lastLiveUpdateEmotePlatform_;
