@@ -6,6 +6,12 @@ Chatterino 2 is a chat client for [Twitch.tv](https://twitch.tv).
 The Chatterino 2 wiki can be found [here](https://wiki.chatterino.com).
 Contribution guidelines can be found [here](https://wiki.chatterino.com/Contributing%20for%20Developers).
 
+## Fork Features
+- Chat message limit changeable
+- Set clipboard to text on focus
+- Tab completion improved
+- Hotkeys
+
 ## Download
 
 Current releases are available at [https://chatterino.com](https://chatterino.com).
