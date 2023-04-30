@@ -58,11 +58,15 @@ public:
     void refresh(const QString &prefix, bool isFirstWord = false);
 
     static bool compareStrings(const QString &a, const QString &b);
+    static bool commandsStatus();
+    static void commandsToggle(bool &status);
+    //static bool commandsEnabled;
+
 
 private:
     mutable std::shared_mutex itemsMutex_;
     std::set<TaggedString> items_;
-
+    //static bool commandsEnabled;
     Channel &channel_;
 };
 

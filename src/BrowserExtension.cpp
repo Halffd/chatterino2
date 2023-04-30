@@ -48,6 +48,7 @@ namespace {
 
         while (true)
         {
+
             char size_c[4];
             std::cin.read(size_c, 4);
 

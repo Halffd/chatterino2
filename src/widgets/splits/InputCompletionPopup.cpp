@@ -14,6 +14,7 @@
 #include "widgets/listview/GenericListView.hpp"
 #include "widgets/splits/InputCompletionItem.hpp"
 
+#include <QDebug>
 namespace {
 
 using namespace chatterino;
@@ -28,9 +29,10 @@ void addEmotes(std::vector<CompletionEmote> &out, const EmoteMap &map,
                const QString &text, const QString &providerName)
 {
     for (auto &&emote : map)
-    {
+    {        
         if (emote.first.string.contains(text, Qt::CaseInsensitive))
         {
+     //       qWarning() << "etwlog//e-" + emote.second->name.string + "-" + emote.first.string;
             out.push_back(
                 {emote.second, emote.second->name.string, providerName});
         }
@@ -79,25 +81,6 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
     // returns true also for special Twitch channels (/live, /mentions, /whispers, etc.)
     if (channel->isTwitchChannel())
     {
-        if (auto user = getApp()->accounts->twitch.getCurrent())
-        {
-            // Twitch Emotes available globally
-            auto emoteData = user->accessEmotes();
-            addEmotes(emotes, emoteData->emotes, text, "Twitch Emote");
-
-            // Twitch Emotes available locally
-            auto localEmoteData = user->accessLocalEmotes();
-            if (tc &&
-                localEmoteData->find(tc->roomId()) != localEmoteData->end())
-            {
-                if (const auto *localEmotes = &localEmoteData->at(tc->roomId()))
-                {
-                    addEmotes(emotes, *localEmotes, text,
-                              "Local Twitch Emotes");
-                }
-            }
-        }
-
         if (tc)
         {
             // TODO extract "Channel {BetterTTV,7TV,FrankerFaceZ}" text into a #define.
@@ -127,6 +110,24 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
         {
             addEmotes(emotes, *seventvG, text, "Global 7TV");
         }
+        if (auto user = getApp()->accounts->twitch.getCurrent())
+        {
+            // Twitch Emotes available globally
+            auto emoteData = user->accessEmotes();
+            addEmotes(emotes, emoteData->emotes, text, "Twitch Emote");
+
+            // Twitch Emotes available locally
+            auto localEmoteData = user->accessLocalEmotes();
+            if (tc &&
+                localEmoteData->find(tc->roomId()) != localEmoteData->end())
+            {
+                if (const auto *localEmotes = &localEmoteData->at(tc->roomId()))
+                {
+                    addEmotes(emotes, *localEmotes, text,
+                              "Local Twitch Emotes");
+                }
+            }
+        }
     }
 
     addEmojis(emotes, getApp()->emotes->emojis.emojis, text);
@@ -137,7 +138,7 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
         auto emoteText = emotes.at(i).displayName;
 
         // test for match or match with colon at start for emotes like ":)"
-        if (emoteText.compare(text, Qt::CaseInsensitive) == 0 ||
+        if (emoteText.compare(text, Qt::CaseInsensitive) == 0  ||
             emoteText.compare(":" + text, Qt::CaseInsensitive) == 0)
         {
             auto emote = emotes[i];

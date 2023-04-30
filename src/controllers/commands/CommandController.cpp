@@ -3224,8 +3224,7 @@ QString CommandController::execCommand(const QString &textNoEmoji,
 {
     QString text = getApp()->emotes->emojis.replaceShortCodes(textNoEmoji);
     QStringList words = text.split(' ', Qt::SkipEmptyParts);
-
-    if (words.length() == 0)
+    if (words.length() == 0 || CompletionModel::commandsStatus() == false)
     {
         return text;
     }

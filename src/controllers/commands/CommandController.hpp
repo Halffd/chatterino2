@@ -33,6 +33,8 @@ public:
                         bool dryRun);
     QStringList getDefaultChatterinoCommandList();
 
+    static bool commandsEnabled;
+
     virtual void initialize(Settings &, Paths &paths) override;
     virtual void save() override;
 

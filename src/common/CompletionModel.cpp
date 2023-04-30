@@ -14,6 +14,9 @@
 #include "singletons/Settings.hpp"
 #include "util/Helpers.hpp"
 #include "util/QStringHash.hpp"
+#include "widgets/splits/Split.hpp"
+#include "messages/Message.hpp"
+#include "messages/MessageBuilder.hpp"
 
 #include <QtAlgorithms>
 
@@ -86,20 +89,15 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     std::unique_lock lock(this->itemsMutex_);
 
     this->items_.clear();
-
-    if (prefix.length() < 2 || !this->channel_.isTwitchChannel())
-    {
-        return;
-    }
-
+    //static bool commandsEnabled;
     // Twitch channel
     auto *tc = dynamic_cast<TwitchChannel *>(&this->channel_);
-
+    //this->channel_.addMessage(makeSystemMessage(". " + commandsEnabled));
     auto addString = [=, this](const QString &str, TaggedString::Type type) {
         // Special case for handling default Twitch commands
         if (type == TaggedString::TwitchCommand)
         {
-            if (prefix.size() < 2)
+            if (prefix.size() < 1)
             {
                 return;
             }
@@ -108,10 +106,10 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
 
             static std::set<QChar> validPrefixChars{'/', '.'};
 
-            if (validPrefixChars.find(prefixChar) == validPrefixChars.end())
+            /*if (validPrefixChars.find(prefixChar) == validPrefixChars.end())
             {
                 return;
-            }
+            }*/
 
             if (startsWithOrContains((prefixChar + str), prefix,
                                      Qt::CaseInsensitive,
@@ -170,7 +168,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     }
 
     // Emojis
-    if (prefix.startsWith(":"))
+    if (prefix.startsWith(":") || getSettings()->emoteCompletion)
     {
         const auto &emojiShortCodes = getApp()->emotes->emojis.shortCodes;
         for (const auto &m : emojiShortCodes)
@@ -236,24 +234,36 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         addString(command, TaggedString::PluginCommand);
     }
 #endif
+    if(getSettings()->commands == true){
     // Custom Chatterino commands
-    for (const auto &command : getApp()->commands->items)
-    {
-        addString(command.name, TaggedString::CustomCommand);
-    }
+        for (const auto &command : getApp()->commands->items)
+        {
+            addString(command.name, TaggedString::CustomCommand);
+        }
 
-    // Default Chatterino commands
-    for (const auto &command :
-         getApp()->commands->getDefaultChatterinoCommandList())
-    {
-        addString(command, TaggedString::ChatterinoCommand);
-    }
+        // Default Chatterino commands
+        for (const auto &command :
+            getApp()->commands->getDefaultChatterinoCommandList())
+        {
+            addString(command, TaggedString::ChatterinoCommand);
+        }
 
-    // Default Twitch commands
-    for (const auto &command : TWITCH_DEFAULT_COMMANDS)
-    {
-        addString(command, TaggedString::TwitchCommand);
+        // Default TwFitch commands
+        for (const auto &command : TWITCH_DEFAULT_COMMANDS)
+        {
+            addString(command, TaggedString::TwitchCommand);
+        }
     }
+}
+bool CompletionModel::commandsStatus()
+{
+    //static bool commandsEnabled;
+    return getSettings()->commands;
+}
+void CompletionModel::commandsToggle(bool &status)
+{
+    //static bool commandsEnabled;
+    getSettings()->commands = status;
 }
 
 bool CompletionModel::compareStrings(const QString &a, const QString &b)

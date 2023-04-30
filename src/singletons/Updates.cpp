@@ -32,7 +32,6 @@ Updates::Updates()
 {
     qCDebug(chatterinoUpdate) << "init UpdateManager";
 }
-
 Updates &Updates::instance()
 {
     // fourtf: don't add this class to the application class
