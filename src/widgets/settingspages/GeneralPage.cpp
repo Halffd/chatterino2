@@ -543,6 +543,8 @@ void GeneralPage::initLayout(GeneralPageView &layout)
                        s.emoteCompletionWithColon);
     layout.addCheckbox("Use experimental smarter emote completion.",
                        s.useSmartEmoteCompletion);
+    layout.addCheckbox("Enable emote auto-completion",
+                       s.emoteCompletion);
     layout.addDropdown<float>(
         "Size", {"0.5x", "0.75x", "Default", "1.25x", "1.5x", "2x"},
         s.emoteScale,
@@ -1126,9 +1128,9 @@ void GeneralPage::initLayout(GeneralPageView &layout)
                        s.twitchMessageHistoryLimit, 10, 800, 10);
 
     layout.addIntInput("Split message scrollback limit (requires restart)",
-                       s.scrollbackSplitLimit, 100, 100000, 100);
+                       s.scrollbackSplitLimit, 100, 2000000000, 100);
     layout.addIntInput("Usercard scrollback limit (requires restart)",
-                       s.scrollbackUsercardLimit, 100, 100000, 100);
+                       s.scrollbackUsercardLimit, 100, 2000000000, 100);
 
     layout.addCheckbox("Enable experimental IRC support (requires restart)",
                        s.enableExperimentalIrc, false,

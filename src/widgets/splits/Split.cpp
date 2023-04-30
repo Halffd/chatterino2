@@ -63,6 +63,7 @@ namespace {
 
 using namespace chatterino;
 
+bool commandsEnabled;
 QString formatVIPListError(HelixListVIPsError error, const QString &message)
 {
     using Error = HelixListVIPsError;
@@ -70,6 +71,7 @@ QString formatVIPListError(HelixListVIPsError error, const QString &message)
     QString errorMessage = QString("Failed to list VIPs - ");
 
     switch (error)
+
     {
         case Error::Forwarded: {
             errorMessage += message;
@@ -367,13 +369,28 @@ Split::Split(QWidget *parent)
             }
         });
 
+    //lastClip = "";
+
+    //this->input_->ui_.textEdit->focused.connect()
+
     this->signalHolder_.managedConnect(this->input_->ui_.textEdit->focused,
                                        [this] {
+                                           if(getSettings()->clipboardFocus.getValue() != ""){
+                                               QClipboard* clipboard = QApplication::clipboard();
+                                               lastClip = clipboard->text();
+                                               //this->getChannel()->addMessage(makeSystemMessage("ClipF: " + lastClip));
+                                               clipboard->setText(getSettings()->clipboardFocus.getValue());
+                                           }
                                            // Forward textEdit's focused event
                                            this->focused.invoke();
-                                       });
+                                                   });
     this->signalHolder_.managedConnect(this->input_->ui_.textEdit->focusLost,
                                        [this] {
+                                            if(getSettings()->clipboardFocus.getValue() != ""){
+                                                //this->getChannel()->addMessage(makeSystemMessage("ClipUnF: " + lastClip));
+                                                QClipboard* clipboard = QApplication::clipboard();
+                                                clipboard->setText(lastClip);
+                                            }
                                            // Forward textEdit's focusLost event
                                            this->focusLost.invoke();
                                        });
@@ -556,7 +573,7 @@ void Split::addShortcuts()
                  scrollbar.offset(-scrollbar.getLargeChange());
              }
              else if (direction == "down")
-             {
+                 {
                  scrollbar.offset(scrollbar.getLargeChange());
              }
              else
@@ -601,7 +618,7 @@ void Split::addShortcuts()
         {"openModView",
          [this](std::vector<QString>) -> QString {
              this->openModViewInBrowser();
-             return "";
+                          return "";
          }},
         {"createClip",
          [this](std::vector<QString>) -> QString {
@@ -646,7 +663,7 @@ void Split::addShortcuts()
              }
              return "";
          }},
-        {"setModerationMode",
+                 {"setModerationMode",
          [this](std::vector<QString> arguments) -> QString {
              if (!this->getChannel()->isTwitchChannel())
              {
@@ -690,6 +707,26 @@ void Split::addShortcuts()
         {"openViewerList",
          [this](std::vector<QString>) -> QString {
              this->showChatterList();
+             return "";
+         }},
+        {"disableCommands",
+         [this](std::vector<QString>) -> QString {
+             this->disableCommands();
+             return "";
+         }},
+        {"turnOnCommands",
+             [this](std::vector<QString>) -> QString {
+             this->turnOnCommands();
+             return "";
+         }},
+        {"turnOffCommands",
+         [this](std::vector<QString>) -> QString {
+             this->turnOffCommands();
+             return "";
+                  }},
+        {"openInStreamlinkOther",
+         [this](std::vector<QString>) -> QString {
+             this->openInStreamlinkOther();
              return "";
          }},
         {"clearMessages",
@@ -741,7 +778,7 @@ void Split::addShortcuts()
                  else if (arg == "on")
                  {
                      mode = 1;
-                 }
+                     }
                  else
                  {
                      mode = 2;
@@ -786,9 +823,74 @@ ChannelView &Split::getChannelView()
 
 SplitInput &Split::getInput()
 {
-    return *this->input_;
+        return *this->input_;
 }
 
+void Split::openBrowserPlayer()
+{
+    ChannelPtr channel = this->getChannel();
+    if (auto twitchChannel = dynamic_cast<TwitchChannel *>(channel.get()))
+    {
+        QDesktopServices::openUrl(
+            "https://player.twitch.tv/?parent=twitch.tv&channel=" +
+            twitchChannel->getName());
+    }
+}
+
+void Split::openInStreamlink() {
+  try {
+    openStreamlinkForChannel(this->getChannel()->getName());
+  } catch (const Exception &ex) {
+    qDebug() << "Error in doOpenStreamlink:" << ex.what();
+  }
+}
+
+void Split::openInStreamlinkOther() {
+  try {
+    //QProcess::startDetached(getSettings()->streamlinkPath +
+    //                        "/streamlink twitch.tv/" +
+    //                        this->getChannel()->getName() + "worst");
+
+    openStreamlink("twitch.tv/" + this->getChannel()->getName(), "best");
+  } catch (const Exception &ex) {
+    qDebug() << "Error: " << ex.what();
+  }
+}
+void Split::disableCommands() {
+    getSettings()->commands = !getSettings()->commands;
+    getSettings()->emoteCompletion = !getSettings()->emoteCompletion;
+    //CompletionModel::commandsToggle(commandsEnabl);
+    auto channel = this->getChannel();
+    if(getSettings()->commands == true){
+    channel->addMessage(makeSystemMessage("Commands: ON"));
+    } else {
+    channel->addMessage(makeSystemMessage("Commands: OFF"));
+    }
+    if(getSettings()->emoteCompletion == true){
+    channel->addMessage(makeSystemMessage("Complete popup: ON"));
+    } else {
+    channel->addMessage(makeSystemMessage("Complete popup: OFF"));
+    }
+
+    //qDebug() << commandsEnabled;
+}
+void Split::turnOnCommands() {
+    getSettings()->commands = true;
+    //CompletionModel::commandsToggle(commandsEnabled);
+
+    auto channel = this->getChannel();
+    channel->addMessage(makeSystemMessage("Commands: ON"));
+
+    //qDebug() << commandsEnabled;
+}
+void Split::turnOffCommands() {
+    getSettings()->commands = false;
+    //CompletionModel::commandsToggle(commandsEnabled);
+    auto channel = this->getChannel();
+    channel->addMessage(makeSystemMessage("DISABLED Commands"));
+
+    //qDebug() << commandsEnabled;
+}
 void Split::updateInputPlaceholder()
 {
     if (!this->getChannel()->isTwitchChannel())
@@ -1128,11 +1230,6 @@ void Split::openWhispersInBrowser()
                               "/whispers");
 }
 
-void Split::openBrowserPlayer()
-{
-    this->openChannelInBrowserPlayer(this->getChannel());
-}
-
 void Split::openModViewInBrowser()
 {
     auto channel = this->getChannel();
@@ -1142,11 +1239,6 @@ void Split::openModViewInBrowser()
         QDesktopServices::openUrl("https://twitch.tv/moderator/" +
                                   twitchChannel->getName());
     }
-}
-
-void Split::openInStreamlink()
-{
-    this->openChannelInStreamlink(this->getChannel()->getName());
 }
 
 void Split::openWithCustomScheme()

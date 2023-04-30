@@ -186,6 +186,12 @@ public:
                                           -0.5f};
     // BoolSetting useCustomWindowFrame = {"/appearance/useCustomWindowFrame",
     // false};
+    BoolSetting changeMsg = {"/external/streamlink/changeMsg", false};
+    QStringSetting smallStreamerLimit = {
+                                         "/behaviour/autocompletion/smallStreamerLimit", "1000"};
+
+    QStringSetting messages = {"/external/streamlink/messages", "1000"};
+    QStringSetting clipboardFocus = {"/external/streamlink/clipboardFocus", ""};
 
     // Badges
     BoolSetting showBadgesGlobalAuthority = {
@@ -236,18 +242,21 @@ public:
     };
     // BoolSetting twitchSeperateWriteConnection =
     // {"/behaviour/twitchSeperateWriteConnection", false};
+    BoolSetting commands = {"/controller/commands/commandsEnabled", true};
 
     // Auto-completion
     BoolSetting onlyFetchChattersForSmallerStreamers = {
         "/behaviour/autocompletion/onlyFetchChattersForSmallerStreamers", true};
-    IntSetting smallStreamerLimit = {
-        "/behaviour/autocompletion/smallStreamerLimit", 1000};
+    //IntSetting smallStreamerLimit = {
+    //    "/behaviour/autocompletion/smallStreamerLimit", 1000};
     BoolSetting prefixOnlyEmoteCompletion = {
         "/behaviour/autocompletion/prefixOnlyCompletion", true};
     BoolSetting userCompletionOnlyWithAt = {
         "/behaviour/autocompletion/userCompletionOnlyWithAt", false};
     BoolSetting emoteCompletionWithColon = {
-        "/behaviour/autocompletion/emoteCompletionWithColon", true};
+                                            "/behaviour/autocompletion/emoteCompletionWithColon", true};
+    BoolSetting emoteCompletion = {
+                                            "/behaviour/autocompletion/emoteCompletion", true};
     BoolSetting showUsernameCompletionMenu = {
         "/behaviour/autocompletion/showUsernameCompletionMenu", true};
     BoolSetting alwaysIncludeBroadcasterInUserCompletions = {
@@ -301,6 +310,11 @@ public:
     IntSetting thumbnailSizeStream = {"/appearance/thumbnailSizeStream", 2};
     BoolSetting unshortLinks = {"/links/unshortLinks", false};
     BoolSetting lowercaseDomains = {"/links/linkLowercase", true};
+
+    //BoolSetting changeMsg = {"/external/streamlink/changeMsg", false};
+
+    //QStringSetting messages = {"/external/streamlink/messages", "1000"};
+    //QStringSetting clipboardFocus = {"/external/streamlink/clipboardFocus", ""};
 
     /// Streamer Mode
     EnumSetting<StreamerModeSetting> enableStreamerMode = {

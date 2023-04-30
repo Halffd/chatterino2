@@ -218,7 +218,7 @@ MessagePaintResult MessageLayout::paint(const MessagePaintContext &ctx)
         this->container_.paintAnimatedElements(ctx.painter, ctx.y);
 
     // draw disabled
-    if (this->message_->flags.has(MessageFlag::Disabled))
+    /*if (this->message_->flags.has(MessageFlag::Disabled))
     {
         ctx.painter.fillRect(0, ctx.y, pixmap->width(), pixmap->height(),
                              ctx.messageColors.disabled);
@@ -229,6 +229,9 @@ MessagePaintResult MessageLayout::paint(const MessagePaintContext &ctx)
         ctx.painter.fillRect(0, ctx.y, pixmap->width(), pixmap->height(),
                              ctx.messageColors.disabled);
     }
+        painter.fillRect(0, y, pixmap->width(), pixmap->height(),
+                         app->themes->messages.disabled);
+    }*/
 
     if (!ctx.isMentions &&
         (this->message_->flags.has(MessageFlag::RedeemedChannelPointReward) ||
@@ -287,7 +290,7 @@ QPixmap *MessageLayout::ensureBuffer(QPainter &painter, int width)
         return this->buffer_.get();
     }
 
-    // Create new buffer
+// Create new buffer
 #if defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
     this->buffer_ = std::make_unique<QPixmap>(
         int(width * painter.device()->devicePixelRatioF()),
@@ -507,3 +510,5 @@ bool MessageLayout::isReplyable() const
 }
 
 }  // namespace chatterino
+
+

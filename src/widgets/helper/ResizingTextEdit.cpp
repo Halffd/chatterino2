@@ -155,7 +155,7 @@ void ResizingTextEdit::keyPressEvent(QKeyEvent *event)
         QString currentCompletion = this->textUnderCursor();
 
         // check if there is something to complete
-        if (currentCompletion.size() <= 1)
+        if (currentCompletionPrefix.size() <= 0)
         {
             return;
         }

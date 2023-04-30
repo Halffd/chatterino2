@@ -485,8 +485,7 @@ QString CommandController::execCommand(const QString &textNoEmoji,
     QString text =
         getIApp()->getEmotes()->getEmojis()->replaceShortCodes(textNoEmoji);
     QStringList words = text.split(' ', Qt::SkipEmptyParts);
-
-    if (words.length() == 0)
+    if (words.length() == 0 || CompletionModel::commandsStatus() == false)
     {
         return text;
     }

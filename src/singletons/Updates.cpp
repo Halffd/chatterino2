@@ -33,6 +33,13 @@ Updates::Updates(const Paths &paths_)
 {
     qCDebug(chatterinoUpdate) << "init UpdateManager";
 }
+Updates &Updates::instance()
+{
+    // fourtf: don't add this class to the application class
+    static Updates instance;
+
+    return instance;
+}
 
 /// Checks if the online version is newer or older than the current version.
 bool Updates::isDowngradeOf(const QString &online, const QString &current)

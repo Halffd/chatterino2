@@ -9,6 +9,47 @@
 #include "util/LayoutCreator.hpp"
 #include "widgets/splits/InputCompletionItem.hpp"
 
+#include <QDebug>
+namespace {
+
+using namespace chatterino;
+
+struct CompletionEmote {
+    EmotePtr emote;
+    QString displayName;
+    QString providerName;
+};
+
+void addEmotes(std::vector<CompletionEmote> &out, const EmoteMap &map,
+               const QString &text, const QString &providerName)
+{
+    for (auto &&emote : map)
+    {        
+        if (emote.first.string.contains(text, Qt::CaseInsensitive))
+        {
+     //       qWarning() << "etwlog//e-" + emote.second->name.string + "-" + emote.first.string;
+            out.push_back(
+                {emote.second, emote.second->name.string, providerName});
+        }
+    }
+}
+
+void addEmojis(std::vector<CompletionEmote> &out, const EmojiMap &map,
+               const QString &text)
+{
+    map.each([&](const QString &, const std::shared_ptr<EmojiData> &emoji) {
+        for (auto &&shortCode : emoji->shortCodes)
+        {
+            if (shortCode.contains(text, Qt::CaseInsensitive))
+            {
+                out.push_back({emoji->emote, shortCode, "Emoji"});
+            }
+        }
+    });
+}
+
+}  // namespace
+
 namespace chatterino {
 
 InputCompletionPopup::InputCompletionPopup(QWidget *parent)
@@ -37,6 +78,53 @@ void InputCompletionPopup::updateCompletion(const QString &text,
     {
         // New completion context
         this->beginCompletion(kind, std::move(channel));
+        if (tc)
+        {
+            // TODO extract "Channel {BetterTTV,7TV,FrankerFaceZ}" text into a #define.
+            if (auto bttv = tc->bttvEmotes())
+            {
+                addEmotes(emotes, *bttv, text, "Channel BetterTTV");
+            }
+            if (auto ffz = tc->ffzEmotes())
+            {
+                addEmotes(emotes, *ffz, text, "Channel FrankerFaceZ");
+            }
+            if (auto seventv = tc->seventvEmotes())
+            {
+                addEmotes(emotes, *seventv, text, "Channel 7TV");
+            }
+        }
+
+        if (auto bttvG = getApp()->twitch->getBttvEmotes().emotes())
+        {
+            addEmotes(emotes, *bttvG, text, "Global BetterTTV");
+        }
+        if (auto ffzG = getApp()->twitch->getFfzEmotes().emotes())
+        {
+            addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
+        }
+        if (auto seventvG = getApp()->twitch->getSeventvEmotes().globalEmotes())
+        {
+            addEmotes(emotes, *seventvG, text, "Global 7TV");
+        }
+        if (auto user = getApp()->accounts->twitch.getCurrent())
+        {
+            // Twitch Emotes available globally
+            auto emoteData = user->accessEmotes();
+            addEmotes(emotes, emoteData->emotes, text, "Twitch Emote");
+
+            // Twitch Emotes available locally
+            auto localEmoteData = user->accessLocalEmotes();
+            if (tc &&
+                localEmoteData->find(tc->roomId()) != localEmoteData->end())
+            {
+                if (const auto *localEmotes = &localEmoteData->at(tc->roomId()))
+                {
+                    addEmotes(emotes, *localEmotes, text,
+                              "Local Twitch Emotes");
+                }
+            }
+        }
     }
 
     assert(this->model_.hasSource());
@@ -44,6 +132,38 @@ void InputCompletionPopup::updateCompletion(const QString &text,
 
     // Move selection to top row
     if (this->model_.rowCount() != 0)
+    // if there is an exact match, put that emote first
+    for (size_t i = 1; i < emotes.size(); i++)
+    {
+        auto emoteText = emotes.at(i).displayName;
+
+        // test for match or match with colon at start for emotes like ":)"
+        if (emoteText.compare(text, Qt::CaseInsensitive) == 0  ||
+            emoteText.compare(":" + text, Qt::CaseInsensitive) == 0)
+        {
+            auto emote = emotes[i];
+            emotes.erase(emotes.begin() + int(i));
+            emotes.insert(emotes.begin(), emote);
+            break;
+        }
+    }
+
+    this->model_.clear();
+
+    int count = 0;
+    for (auto &&emote : emotes)
+    {
+        this->model_.addItem(std::make_unique<InputCompletionItem>(
+            emote.emote, emote.displayName + " - " + emote.providerName,
+            this->callback_));
+
+        if (count++ == MAX_ENTRY_COUNT)
+        {
+            break;
+        }
+    }
+
+    if (!emotes.empty())
     {
         this->ui_.listView->setCurrentIndex(this->model_.index(0));
     }

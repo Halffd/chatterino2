@@ -93,7 +93,7 @@ public:
 
     /**
      * @brief Get the last item from the queue
-     *
+         *
      * @return the item at the back of the queue if it's populated, or none the queue is empty
      */
     [[nodiscard]] std::optional<T> last() const

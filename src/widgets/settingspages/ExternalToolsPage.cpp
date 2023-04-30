@@ -60,6 +60,11 @@ ExternalToolsPage::ExternalToolsPage()
                                  "non-standard streamlink installation path)",
                                  getSettings()->streamlinkUseCustomPath);
         groupLayout->setWidget(2, QFormLayout::SpanningRole, customPathCb);
+        auto changeMessage = this->createCheckBox("Change Limit", getSettings()->changeMsg);
+        auto commands = this->createCheckBox("Enable commads",
+                                             getSettings()->commands);
+        groupLayout->setWidget(3, QFormLayout::SpanningRole, changeMessage);
+        groupLayout->setWidget(4, QFormLayout::SpanningRole, commands);
 
         auto *note = new QLabel(
             QStringLiteral(
@@ -80,6 +85,13 @@ ExternalToolsPage::ExternalToolsPage()
         groupLayout->addRow(
             "Additional options:",
             this->createLineEdit(getSettings()->streamlinkOpts));
+
+        groupLayout->addRow("Change messages limit:",
+                            this->createLineEdit(getSettings()->messages));
+        groupLayout->addRow("Small streamers limit (1000):",
+                            this->createLineEdit(getSettings()->smallStreamerLimit));
+        groupLayout->addRow("Set clipboard to text on focus:",
+                            this->createLineEdit(getSettings()->clipboardFocus));
 
         getSettings()->streamlinkUseCustomPath.connect(
             [=](const auto &value, auto) {

@@ -11,7 +11,8 @@ Contribution guidelines can be found [here](https://wiki.chatterino.com/Contribu
 - Set clipboard to text on focus
 - Tab completion improved
 - Hotkeys
-
+. Commands togghle
+  Automatic completion popup showing (:)
 ## Download
 
 Current releases are available at [https://chatterino.com](https://chatterino.com).

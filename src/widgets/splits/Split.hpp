@@ -69,7 +69,11 @@ public:
     void updateLastReadMessage();
     void setIsTopRightSplit(bool value);
 
+    //static bool commandsEnabled;
+    
     void drag();
+
+    void openInStreamlink();
 
     bool isInContainer() const;
 
@@ -156,6 +160,14 @@ private:
     SplitOverlay *const overlay_;
 
     QPointer<SelectChannelDialog> selectChannelDialog_;
+    QString lastClip;
+
+    void openInStreamlinkOther();
+    void disableCommands();
+    void turnOnCommands();
+    void turnOffCommands();
+
+    NullablePtr<SelectChannelDialog> selectChannelDialog_;
 
     pajlada::Signals::Connection channelIDChangedConnection_;
     pajlada::Signals::Connection usermodeChangedConnection_;
@@ -181,7 +193,7 @@ public slots:
     void openModViewInBrowser();
     void openWhispersInBrowser();
     void openBrowserPlayer();
-    void openInStreamlink();
+    //void openInStreamlink();
     void openWithCustomScheme();
     void setFiltersDialog();
     void showSearch(bool singleChannel);

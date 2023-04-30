@@ -29,6 +29,7 @@
 #include <QCompleter>
 #include <QPainter>
 #include <QSignalBlocker>
+#include <QDebug>
 
 #include <functional>
 
@@ -731,9 +732,12 @@ void SplitInput::updateCompletionPopup()
     auto *channel = this->split_->getChannel().get();
     auto *tc = dynamic_cast<TwitchChannel *>(channel);
     bool showEmoteCompletion = getSettings()->emoteCompletionWithColon;
+
+    bool completion = getSettings()->emoteCompletion;
     bool showUsernameCompletion =
         tc != nullptr && getSettings()->showUsernameCompletionMenu;
-    if (!showEmoteCompletion && !showUsernameCompletion)
+    //    qWarning() << "htwlog//varbool " + completion + " " + showEmoteCompletion;
+    if (!completion && !showEmoteCompletion && !showUsernameCompletion)
     {
         this->hideCompletionPopup();
         return;
@@ -744,12 +748,16 @@ void SplitInput::updateCompletionPopup()
 
     auto text = edit.toPlainText();
     auto position = edit.textCursor().position() - 1;
-
+    if(!(text.mid(0,1) == ":") && completion){
+        text = ":" + text;
+    }
+   // qWarning() << "htwlog//tx " + text + "." + position + text.mid(0);
     if (text.length() == 0 || position == -1)
     {
         this->hideCompletionPopup();
         return;
     }
+
 
     for (int i = clamp(position, 0, (int)text.length() - 1); i >= 0; i--)
     {
@@ -759,8 +767,9 @@ void SplitInput::updateCompletionPopup()
             return;
         }
 
-        if (text[i] == ':' && showEmoteCompletion)
+        if(text[i] == ':' && showEmoteCompletion)
         {
+       //     qWarning() << "htwlog// completion " + i;
             if (i == 0 || text[i - 1].isSpace())
             {
                 this->showCompletionPopup(text.mid(i, position - i + 1),
@@ -771,7 +780,21 @@ void SplitInput::updateCompletionPopup()
                 this->hideCompletionPopup();
             }
             return;
-        }
+        }/* else {
+            if(completion){
+                qWarning() << "htwlog// completion2 " + i;
+                if (i == 0 || text[i - 1].isSpace())
+                {
+                    this->showCompletionPopup(text.mid(i, position - i + 1).mid(1),
+                                              true);
+                }
+                else
+                {
+                    this->hideCompletionPopup();
+                }
+                return;
+            }
+        }*/
 
         if (text[i] == '@' && showUsernameCompletion)
         {
@@ -836,7 +859,7 @@ void SplitInput::insertCompletionText(const QString &input_) const
 
     for (int i = clamp(position, 0, (int)text.length() - 1); i >= 0; i--)
     {
-        bool done = false;
+        bool done = true;
         if (text[i] == ':')
         {
             done = true;
@@ -879,6 +902,7 @@ bool SplitInput::isEditFirstWord() const
 {
     return this->ui_.textEdit->isFirstWord();
 }
+
 
 QString SplitInput::getInputText() const
 {
