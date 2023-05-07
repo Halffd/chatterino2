@@ -856,10 +856,18 @@ void SplitInput::insertCompletionText(const QString &input_) const
 
     auto text = edit.toPlainText();
     auto position = edit.textCursor().position() - 1;
-
+    if(text.mid(0,1) != ':' && text.mid(0,1) != '@'){
+        if(text.length() <= 1){
+            text.remove(0, 1);
+            text = ':';
+        } else {
+            text = ':' + text.mid(0,text.length()-2);
+        }
+    }
+    //qDebug() << "htxx " + text + " i " + input + " p " + position;
     for (int i = clamp(position, 0, (int)text.length() - 1); i >= 0; i--)
     {
-        bool done = true;
+        bool done = false;
         if (text[i] == ':')
         {
             done = true;
