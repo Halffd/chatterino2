@@ -1,0 +1,1 @@
+. "/home/half/chatterino2/deactivate_conanbuildenv-release-x86_64.sh"
