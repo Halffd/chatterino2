@@ -729,6 +729,26 @@ void Split::addShortcuts()
              this->openInStreamlinkOther();
              return "";
          }},
+        {"disableCommands",
+         [this](std::vector<QString>) -> QString {
+             this->disableCommands();
+             return "";
+         }},
+        {"turnOnCommands",
+             [this](std::vector<QString>) -> QString {
+             this->turnOnCommands();
+             return "";
+         }},
+        {"turnOffCommands",
+         [this](std::vector<QString>) -> QString {
+             this->turnOffCommands();
+             return "";
+                  }},
+        {"openInStreamlinkOther",
+         [this](std::vector<QString>) -> QString {
+             this->openInStreamlinkOther();
+             return "";
+         }},
         {"clearMessages",
          [this](std::vector<QString>) -> QString {
              this->clear();
