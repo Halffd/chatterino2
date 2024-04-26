@@ -13,6 +13,7 @@ Contribution guidelines can be found [here](https://wiki.chatterino.com/Contribu
 - Hotkeys
 - Commands toggle
 - Automatic completion popup showing (:)
+
 ## Download
 
 Current releases are available at [https://chatterino.com](https://chatterino.com).
